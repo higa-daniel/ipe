@@ -21,3 +21,12 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Android
+.DS_Store
+android/.gradle
+android/.idea
+android/app/build/
+
+# Models
+model/.ipynb_checkpoints/
