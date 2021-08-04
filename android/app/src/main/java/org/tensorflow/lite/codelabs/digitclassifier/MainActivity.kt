@@ -1,5 +1,4 @@
 /* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -31,7 +30,6 @@ class MainActivity : AppCompatActivity() {
     private var predictedTextView: TextView? = null
     private var digitClassifier = DigitClassifier(this)
     private lateinit var imageView: ImageView
-    private var fileName = ""
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,19 +54,26 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "OnResume")
         super.onResume()
 
+        // Get .png from assets/testset folder and save in a list
+        val fileList = assets.list("testset")
+        var i = 0
+
         nextButton = findViewById<Button>(R.id.next_button) as Button
         nextButton!!.setOnClickListener {
-            // Get an image from assets folder
-            fileName = "img_01.png"
-            val bitmap: Bitmap? = assetsToBitmap(fileName)
 
-            // Classify image
-            classifyImage(bitmap)
+            if (fileList != null) {
+                var bitmap: Bitmap? = assetsToBitmap("testset/" + fileList[i % fileList.size])
 
-            // Show bitmap on image view
-            bitmap?.apply {
-                imageView = findViewById<ImageView>(R.id.imageView)
-                imageView.setImageBitmap(this)
+                // Classify image
+                classifyImage(bitmap)
+
+                // Show bitmap on image view
+                bitmap?.apply {
+                    imageView = findViewById<ImageView>(R.id.imageView)
+                    imageView.setImageBitmap(this)
+
+                }
+                i++
             }
         }
     }
@@ -80,19 +85,19 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    // Auxiliary functions
-    // extension function to set image view image from assets folder
+    // AUXILIARY FUNCTIONS
+    // Extension function to set image view image from assets folder
     fun ImageView.setImageAssets(context: Context, fileName: String) {
         try {
             with(context.assets.open(fileName)) {
                 setImageBitmap(BitmapFactory.decodeStream(this))
             }
         } catch (e: IOException) {
-            // log error
+            Log.e(TAG, "Error setting image.", e)
         }
     }
 
-    // extension function to get bitmap from assets
+    // Extension function to get bitmap from assets
     fun Context.assetsToBitmap(fileName: String): Bitmap? {
         return try {
             with(assets.open(fileName)) {
@@ -114,7 +119,7 @@ class MainActivity : AppCompatActivity() {
                         R.string.classification_error_message,
                         e.localizedMessage
                     )
-                    Log.e(TAG, "Error classifying drawing.", e)
+                    Log.e(TAG, "Error classifying image.", e)
                 }
         }
     }
